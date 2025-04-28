@@ -1,0 +1,31 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+:root{
+    --primary-font: Mahoor;
+}
+@font-face {
+    font-family: Mahoor;
+    src: url(../fonts/Mahoor-FD-Regular.woff2);
+    font-weight: 400;
+}
+@font-face {
+    font-family: Mahoor;
+    src: url(../fonts/Mahoor-FD-Medium.woff2);
+    font-weight: 500;
+}
+@font-face {
+    font-family: Mahoor;
+    src: url(../fonts/Mahoor-FD-SemiBold.woff2);
+    font-weight: 600;
+}
+@font-face {
+    font-family: Mahoor;
+    src: url(../fonts/Mahoor-FD-Bold.woff2);
+    font-weight: 700;
+}
+@font-face {
+    font-family: Mahoor;
+    src: url(../fonts/Mahoor-FD-ExtraBold.woff2);
+    font-weight: 800;
+}
