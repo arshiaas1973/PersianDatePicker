@@ -4,12 +4,12 @@
 As you can see from the name of repository, This repository represents a date picker for Persian Calender. I have written this tool with Vue.js framework but it is more compatible with Nuxt.js framework. Since Nuxt.js framework auto imports Vue.js functions. You can add Vue.js imports and then use it with only Vue.js (without Nuxt.js)
 
 ## Packages and API used
-[@internationalized/date](https://www.npmjs.com/package/@internationalized/date)
-[@nuxt/ui](https://ui.nuxt.com/)
-[tailwindcss](https://tailwindcss.com/)
-[axios](https://axios-http.com/)
-[jalali-moment](https://github.com/fingerpich/jalali-moment)
-[API](https://pnldev.com/api/calender) ~> برای بدست آوردن تعطیلات رسمی
+#### [@internationalized/date](https://www.npmjs.com/package/@internationalized/date)
+#### [@nuxt/ui](https://ui.nuxt.com/)
+#### [tailwindcss](https://tailwindcss.com/)
+#### [axios](https://axios-http.com/)
+#### [jalali-moment](https://github.com/fingerpich/jalali-moment)
+#### [API](https://pnldev.com/api/calender) ~> برای بدست آوردن تعطیلات رسمی
 
 # Run - اجرا
 ```
