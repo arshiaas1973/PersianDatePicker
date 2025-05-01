@@ -212,6 +212,11 @@ onMounted(async () => {
     await resetDaysOfMonth();
     document.documentElement.style.setProperty("--datepicker-background-hover", hoverBackground);
     document.documentElement.style.setProperty("--shadow-color", shadowColor);
+    if (mode == DatePickerMode.ONLYPAST) {
+        CurrentDate.value = CurrentDate.value.subtract({days:1});
+    }else if(mode == DatePickerMode.ONLYFUTURE){
+        CurrentDate.value = CurrentDate.value.add({days:1});
+    }
 })
 </script>
 <template>
@@ -239,10 +244,21 @@ onMounted(async () => {
                     <div class="flex flex-row gap-x-[20px] w-full relative items-center justify-center">
                         <button class="sticky aspect-square w-fit h-fit" @click="() => {
                             CurrentDate = CurrentDate.subtract({ months: 1 });
-                        }">
+                        }" v-if="(
+                            (mode == DatePickerMode.ONLYPAST && CurrentDate.copy().subtract({ months: 1 }).set({ day: 1 }).compare(TodaysDate) < 0) ||
+                            (mode == DatePickerMode.ONLYFUTURE && CurrentDate.copy().subtract({ months: 1 }).set({ day: 1 }).compare(TodaysDate) > 0) ||
+                            (mode == DatePickerMode.PASTANDFUTURE)
+                        )">
                             <Icon name="material-symbols:arrow-right-alt-rounded"
                                 class="cursor-pointer opacity-65 hover:opacity-100 transition-opacity duration-200 ease-linear text-2xl"
                                 :style="{
+                                    color: foreground
+                                }">
+                            </Icon>
+                        </button>
+                        <button class="sticky aspect-square w-fit h-fit cursor-default" v-else disabled>
+                            <Icon name="material-symbols:arrow-right-alt-rounded"
+                                class="opacity-35 transition-opacity duration-200 ease-linear text-2xl" :style="{
                                     color: foreground
                                 }">
                             </Icon>
@@ -255,13 +271,24 @@ onMounted(async () => {
                             <span>{{ Months[CurrentDate.month - 1] }}</span>
                             <span>{{ CurrentDate.year.toLocaleString("fa-IR", { useGrouping: false }) }}</span>
                         </button>
-                        <button class="sticky aspect-square w-fit h-fit" @click="() => {
+                        <button class="sticky aspect-square w-fit h-fit" v-if="(
+                            (mode == DatePickerMode.ONLYPAST && CurrentDate.copy().add({ months: 1 }).set({ day: 1 }).compare(TodaysDate) < 0) ||
+                            (mode == DatePickerMode.ONLYFUTURE && CurrentDate.copy().add({ months: 1 }).set({ day: 1 }).compare(TodaysDate) > 0) ||
+                            (mode == DatePickerMode.PASTANDFUTURE)
+                        )" @click="() => {
                             console.log(CurrentDate);
                             CurrentDate = CurrentDate.add({ months: 1 });
                         }">
                             <Icon name="material-symbols:arrow-left-alt-rounded"
                                 class="text-2xl cursor-pointer opacity-65 hover:opacity-100 transition-opacity duration-200 ease-linear"
                                 :style="{
+                                    color: foreground
+                                }">
+                            </Icon>
+                        </button>
+                        <button class="sticky aspect-square w-fit h-fit cursor-default" v-else disabled>
+                            <Icon name="material-symbols:arrow-left-alt-rounded"
+                                class="text-2xl opacity-35 transition-opacity duration-200 ease-linear" :style="{
                                     color: foreground
                                 }">
                             </Icon>
@@ -297,9 +324,15 @@ onMounted(async () => {
                                                     <button class="w-full cursor-pointer" @click="() => {
                                                         CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][(index - 2)]);
                                                         ShowCalender = false;
-                                                    }">
-                                                        {{
-                                                            DaysOfMonth[subindex][(index - 2)] }}
+                                                    }" v-if="(
+                                                        (mode == DatePickerMode.ONLYPAST && CurrentDate.copy().set({ day: DaysOfMonth[subindex][(index - 2)] }).compare(TodaysDate) < 0) ||
+                                                        (mode == DatePickerMode.ONLYFUTURE && CurrentDate.copy().set({ day: DaysOfMonth[subindex][(index - 2)] }).compare(TodaysDate) > 0) ||
+                                                        (mode == DatePickerMode.PASTANDFUTURE)
+                                                    )">
+                                                        {{ DaysOfMonth[subindex][(index - 2)] }}
+                                                    </button>
+                                                    <button class="w-full opacity-50" disabled v-else>
+                                                        {{ DaysOfMonth[subindex][(index - 2)] }}
                                                     </button>
                                                 </span>
                                             </span>
@@ -314,9 +347,15 @@ onMounted(async () => {
                                                         <button class="w-full cursor-pointer" @click="() => {
                                                             CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index]);
                                                             ShowCalender = false;
-                                                        }">
-                                                            {{
-                                                                DaysOfMonth[subindex][index] }}
+                                                        }" v-if="(
+                                                            (mode == DatePickerMode.ONLYPAST && CurrentDate.copy().set({ day: DaysOfMonth[subindex][index] }).compare(TodaysDate) < 0) ||
+                                                            (mode == DatePickerMode.ONLYFUTURE && CurrentDate.copy().set({ day: DaysOfMonth[subindex][index] }).compare(TodaysDate) > 0) ||
+                                                            (mode == DatePickerMode.PASTANDFUTURE)
+                                                        )">
+                                                            {{ DaysOfMonth[subindex][index] }}
+                                                        </button>
+                                                        <button class="w-full opacity-50" disabled v-else>
+                                                            {{ DaysOfMonth[subindex][index] }}
                                                         </button>
                                                     </span>
                                                 </span>
@@ -327,9 +366,15 @@ onMounted(async () => {
                                                         <button class="w-full cursor-pointer" @click="() => {
                                                             CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][(index - 1)]);
                                                             ShowCalender = false;
-                                                        }">
-                                                            {{
-                                                                DaysOfMonth[subindex][(index - 1)] }}
+                                                        }" v-if="(
+                                                            (mode == DatePickerMode.ONLYPAST && CurrentDate.copy().set({ day: DaysOfMonth[subindex][(index - 1)] }).compare(TodaysDate) < 0) ||
+                                                            (mode == DatePickerMode.ONLYFUTURE && CurrentDate.copy().set({ day: DaysOfMonth[subindex][(index - 1)] }).compare(TodaysDate) > 0) ||
+                                                            (mode == DatePickerMode.PASTANDFUTURE)
+                                                        )">
+                                                            {{ DaysOfMonth[subindex][(index - 1)] }}
+                                                        </button>
+                                                        <button class="w-full opacity-50" disabled v-else>
+                                                            {{ DaysOfMonth[subindex][(index - 1)] }}
                                                         </button>
                                                     </span>
                                                 </span>
@@ -346,11 +391,19 @@ onMounted(async () => {
                                                                 <button class="w-full cursor-pointer" @click="() => {
                                                                     CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][DaysOfMonth[subindex].length - 1]);
                                                                     ShowCalender = false;
-                                                                }">
+                                                                }" v-if="(
+                                                                    (mode == DatePickerMode.ONLYPAST && CurrentDate.copy().set({ day: DaysOfMonth[subindex][DaysOfMonth[subindex].length - 1] }).compare(TodaysDate) < 0) ||
+                                                                    (mode == DatePickerMode.ONLYFUTURE && CurrentDate.copy().set({ day: DaysOfMonth[subindex][DaysOfMonth[subindex].length - 1] }).compare(TodaysDate) > 0) ||
+                                                                    (mode == DatePickerMode.PASTANDFUTURE)
+                                                                )">
                                                                     {{
                                                                         DaysOfMonth[subindex][DaysOfMonth[subindex].length -
-                                                                        1]
-                                                                    }}
+                                                                        1] }}
+                                                                </button>
+                                                                <button class="w-full opacity-50" disabled v-else>
+                                                                    {{
+                                                                        DaysOfMonth[subindex][DaysOfMonth[subindex].length -
+                                                                        1] }}
                                                                 </button>
                                                             </span>
                                                             <span v-else :style="{
@@ -359,10 +412,17 @@ onMounted(async () => {
                                                                 <button class="w-full cursor-pointer" @click="() => {
                                                                     CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index - 1]);
                                                                     ShowCalender = false;
-                                                                }">
+                                                                }" v-if="(
+                                                                    (mode == DatePickerMode.ONLYPAST && CurrentDate.copy().set({ day: DaysOfMonth[subindex][index - 1] }).compare(TodaysDate) < 0) ||
+                                                                    (mode == DatePickerMode.ONLYFUTURE && CurrentDate.copy().set({ day: DaysOfMonth[subindex][index - 1] }).compare(TodaysDate) > 0) ||
+                                                                    (mode == DatePickerMode.PASTANDFUTURE)
+                                                                )">
                                                                     {{
-                                                                        DaysOfMonth[subindex][index - 1]
-                                                                    }}
+                                                                        DaysOfMonth[subindex][index - 1] }}
+                                                                </button>
+                                                                <button class="w-full opacity-50" disabled v-else>
+                                                                    {{
+                                                                        DaysOfMonth[subindex][index - 1] }}
                                                                 </button>
                                                             </span>
                                                         </span>
@@ -372,8 +432,17 @@ onMounted(async () => {
                                                             <button class="w-full cursor-pointer" @click="() => {
                                                                 CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index]);
                                                                 ShowCalender = false;
-                                                            }">
-                                                                {{ DaysOfMonth[subindex][index] }}
+                                                            }" v-if="(
+                                                                (mode == DatePickerMode.ONLYPAST && CurrentDate.copy().set({ day: DaysOfMonth[subindex][index] }).compare(TodaysDate) < 0) ||
+                                                                (mode == DatePickerMode.ONLYFUTURE && CurrentDate.copy().set({ day: DaysOfMonth[subindex][index] }).compare(TodaysDate) > 0) ||
+                                                                (mode == DatePickerMode.PASTANDFUTURE)
+                                                            )">
+                                                                {{
+                                                                    DaysOfMonth[subindex][index] }}
+                                                            </button>
+                                                            <button class="w-full opacity-50" disabled v-else>
+                                                                {{
+                                                                    DaysOfMonth[subindex][index] }}
                                                             </button>
                                                         </span>
                                                     </span>
@@ -383,8 +452,17 @@ onMounted(async () => {
                                                         <button class="w-full cursor-pointer" @click="() => {
                                                             CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index]);
                                                             ShowCalender = false;
-                                                        }">
-                                                            {{ DaysOfMonth[subindex][index] }}
+                                                        }" v-if="(
+                                                                (mode == DatePickerMode.ONLYPAST && CurrentDate.copy().set({ day: DaysOfMonth[subindex][index] }).compare(TodaysDate) < 0) ||
+                                                                (mode == DatePickerMode.ONLYFUTURE && CurrentDate.copy().set({ day: DaysOfMonth[subindex][index] }).compare(TodaysDate) > 0) ||
+                                                                (mode == DatePickerMode.PASTANDFUTURE)
+                                                            )">
+                                                            {{
+                                                                DaysOfMonth[subindex][index] }}
+                                                        </button>
+                                                        <button class="w-full opacity-50" disabled v-else>
+                                                            {{
+                                                                DaysOfMonth[subindex][index] }}
                                                         </button>
                                                     </span>
                                                 </span>
