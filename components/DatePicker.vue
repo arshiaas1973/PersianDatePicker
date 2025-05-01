@@ -33,9 +33,9 @@ const {
 // Refs
 const ShowCalender = ref<boolean>(false);
 const CalenderStyle = ref({
-    borderColor: borderColor,
-    background: background,
-    color: foreground,
+    // borderColor: borderColor,
+    // background: background,
+    // color: foreground,
 });
 //  1st day of month is on which day of week.
 const StartDayOfWeek = ref<number>(0);
@@ -60,7 +60,16 @@ watch(() => hoverBackground, () => {
     document.documentElement.style.setProperty("--datepicker-background-hover", hoverBackground);
 });
 watch(() => shadowColor, () => {
-    document.documentElement.style.setProperty("--shadow-color",shadowColor);
+    document.documentElement.style.setProperty("--shadow-color", shadowColor);
+});
+watch(() => background, (oldval, newval) => {
+    CalenderStyle.value.background = newval;
+});
+watch(() => borderColor, (oldval, newval) => {
+    CalenderStyle.value.borderColor = newval;
+});
+watch(() => foreground, (oldval, newval) => {
+    CalenderStyle.value.color = newval;
 });
 watch(CurrentDate, async (oldvalue, newvalue) => {
     await resetDaysOfMonth();
@@ -181,9 +190,9 @@ onMounted(async () => {
     new ResizeObserver(() => {
         if (ParrentDiv.value!.offsetWidth > 200) {
             CalenderStyle.value = {
-                borderColor: borderColor,
-                background: background,
-                color: foreground,
+                // borderColor: borderColor,
+                // background: background,
+                // color: foreground,
                 position: "absolute",
                 transform: "translate(-50%,100%)",
                 left: "50%",
@@ -192,20 +201,21 @@ onMounted(async () => {
             ParrentDiv.value!.style.setProperty("align-items", "center");
         } else {
             CalenderStyle.value = {
-                borderColor: borderColor,
-                background: background,
-                color: foreground,
+                // borderColor: borderColor,
+                // background: background,
+                // color: foreground,
             };
             ParrentDiv.value!.style.setProperty("align-items", "start");
         }
     }).observe(ParrentDiv.value!);
+
     await resetDaysOfMonth();
     document.documentElement.style.setProperty("--datepicker-background-hover", hoverBackground);
-    document.documentElement.style.setProperty("--shadow-color",shadowColor);
+    document.documentElement.style.setProperty("--shadow-color", shadowColor);
 })
 </script>
 <template>
-    <div class="relative w-full flex flex-col" ref="ParrentDiv">
+    <div class="relative w-full flex flex-col z-500" ref="ParrentDiv">
         <button
             class="hover:bg-(--datepicker-background-hover) font-(family-name:--primary-font) cursor-pointer text-[18px] font-medium px-[15px] pt-[8px] pb-[5px] rounded-[12px] border-2 border-solid w-fit"
             :style="{
@@ -220,129 +230,150 @@ onMounted(async () => {
             {{ CurrentDate.year.toLocaleString("fa-IR", { useGrouping: false }) }}
         </button>
         <Transition name="fade" :duration="200">
-            <div class="z-500 rounded-[6px] border-2 border-solid py-[10px] px-[15px] flex flex-col w-max"
-                v-show="ShowCalender" :style="CalenderStyle">
-                <div class="flex flex-row gap-x-[20px] w-full relative items-center justify-center">
-                    <button class="sticky aspect-square w-fit h-fit" @click="() => {
-                        CurrentDate = CurrentDate.subtract({ months: 1 });
-                    }">
-                        <Icon name="material-symbols:arrow-right-alt-rounded"
-                            class="cursor-pointer opacity-65 hover:opacity-100 transition-opacity duration-200 ease-linear text-2xl"
-                            :style="{
-                                color: foreground
-                            }">
-                        </Icon>
-                    </button>
-                    <button
-                        class="font-(family-name:--primary-font) hover:bg-(--datepicker-background-hover) hover:shadow-md hover:shadow-(color:--shadow-color) px-[10px] py-[6px] rounded-[6px]  cursor-pointer text-[16px] font-bold flex flex-row gap-x-[5px] transition-all ease-linear duration-150"
-                        @click="() => {
-                            ShowPopup = !ShowPopup;
+            <div class="z-500 rounded-[6px] w-max" v-show="ShowCalender" :style="CalenderStyle">
+                <div class="py-[10px] px-[15px] flex flex-col border-2 border-solid" :style="{
+                    background: background,
+                    borderColor: borderColor,
+                    color: foreground,
+                }">
+                    <div class="flex flex-row gap-x-[20px] w-full relative items-center justify-center">
+                        <button class="sticky aspect-square w-fit h-fit" @click="() => {
+                            CurrentDate = CurrentDate.subtract({ months: 1 });
                         }">
-                        <span>{{ Months[CurrentDate.month - 1] }}</span>
-                        <span>{{ CurrentDate.year.toLocaleString("fa-IR", { useGrouping: false }) }}</span>
-                    </button>
-                    <button class="sticky aspect-square w-fit h-fit" @click="() => {
-                        console.log(CurrentDate);
-                        CurrentDate = CurrentDate.add({ months: 1 });
-                    }">
-                        <Icon name="material-symbols:arrow-left-alt-rounded"
-                            class="text-2xl cursor-pointer opacity-65 hover:opacity-100 transition-opacity duration-200 ease-linear"
-                            :style="{
-                                color: foreground
+                            <Icon name="material-symbols:arrow-right-alt-rounded"
+                                class="cursor-pointer opacity-65 hover:opacity-100 transition-opacity duration-200 ease-linear text-2xl"
+                                :style="{
+                                    color: foreground
+                                }">
+                            </Icon>
+                        </button>
+                        <button
+                            class="font-(family-name:--primary-font) hover:bg-(--datepicker-background-hover) hover:shadow-md hover:shadow-(color:--shadow-color) px-[10px] py-[6px] rounded-[6px]  cursor-pointer text-[16px] font-bold flex flex-row gap-x-[5px] transition-all ease-linear duration-150"
+                            @click="() => {
+                                ShowPopup = !ShowPopup;
                             }">
-                        </Icon>
-                    </button>
-                </div>
-                <div class="relative">
-                    <Transition :duration="200" name="fade">
-                        <table
-                            class="font-(family-name:--secondary-font) table [&_td,&_th]:py-[5px] [&_td,&_th]:px-[10px]">
-                            <thead>
-                                <tr class="text-lg">
-                                    <th>شنبه</th>
-                                    <th>یکشنبه</th>
-                                    <th>دوشنبه</th>
-                                    <th>سه شنبه</th>
-                                    <th>چهارشنبه</th>
-                                    <th>پنجشنبه</th>
-                                    <th>جمعه</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="font-(family-name:--primary-font) text-xl font-bold"
-                                    v-for="(_, index) in Array.from({ length: ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) })">
-                                    <td class="text-center rounded-[6px] transition-colors duration-150 ease-linear hover:bg-(--datepicker-background-hover)"
-                                        v-for="(__, subindex) in Array.from({ length: DaysOfMonth.length })">
-                                        <span
-                                            v-if="(ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) - DaysOfMonth[subindex].length == 2)">
+                            <span>{{ Months[CurrentDate.month - 1] }}</span>
+                            <span>{{ CurrentDate.year.toLocaleString("fa-IR", { useGrouping: false }) }}</span>
+                        </button>
+                        <button class="sticky aspect-square w-fit h-fit" @click="() => {
+                            console.log(CurrentDate);
+                            CurrentDate = CurrentDate.add({ months: 1 });
+                        }">
+                            <Icon name="material-symbols:arrow-left-alt-rounded"
+                                class="text-2xl cursor-pointer opacity-65 hover:opacity-100 transition-opacity duration-200 ease-linear"
+                                :style="{
+                                    color: foreground
+                                }">
+                            </Icon>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <Transition :duration="200" name="fade">
+                            <table
+                                class="font-(family-name:--secondary-font) table [&_td,&_th]:py-[5px] [&_td,&_th]:px-[10px]">
+                                <thead>
+                                    <tr class="text-lg">
+                                        <th>شنبه</th>
+                                        <th>یکشنبه</th>
+                                        <th>دوشنبه</th>
+                                        <th>سه شنبه</th>
+                                        <th>چهارشنبه</th>
+                                        <th>پنجشنبه</th>
+                                        <th>جمعه</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="font-(family-name:--primary-font) text-xl font-bold"
+                                        v-for="(_, index) in Array.from({ length: ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) })">
+                                        <td class="text-center rounded-[6px] transition-colors duration-150 ease-linear hover:bg-(--datepicker-background-hover)"
+                                            v-for="(__, subindex) in Array.from({ length: DaysOfMonth.length })">
                                             <span
-                                                v-if="(index != (ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) - 1)) && (index != 0)"
-                                                :style="{
-                                                    color: ((subindex == 6) || (DaysOfMonth[subindex][(index - 2)] && HolidayInMonth.includes(DaysOfMonth[subindex][(index - 2)]))) ? 'red' : foreground,
-                                                }">
-                                                <button class="w-full cursor-pointer" @click="() => {
-                                                    CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][(index - 2)]);
-                                                }">
-                                                    {{
-                                                        DaysOfMonth[subindex][(index - 2)] }}
-                                                </button>
-                                            </span>
-                                        </span>
-                                        <span
-                                            v-else-if="(ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) - DaysOfMonth[subindex].length == 1)">
-                                            <span v-if="subindex > StartDayOfWeek">
+                                                v-if="(ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) - DaysOfMonth[subindex].length == 2)">
                                                 <span
-                                                    v-if="(index != (ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) - 1))"
+                                                    v-if="(index != (ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) - 1)) && (index != 0)"
                                                     :style="{
-                                                        color: ((subindex == 6) || (DaysOfMonth[subindex][index] && HolidayInMonth.includes(DaysOfMonth[subindex][index]))) ? 'red' : foreground
+                                                        color: ((subindex == 6) || (DaysOfMonth[subindex][(index - 2)] && HolidayInMonth.includes(DaysOfMonth[subindex][(index - 2)]))) ? 'red' : foreground,
                                                     }">
                                                     <button class="w-full cursor-pointer" @click="() => {
-                                                        CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index]);
+                                                        CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][(index - 2)]);
+                                                        ShowCalender = false;
                                                     }">
                                                         {{
-                                                            DaysOfMonth[subindex][index] }}
+                                                            DaysOfMonth[subindex][(index - 2)] }}
                                                     </button>
                                                 </span>
                                             </span>
-                                            <span v-else>
-                                                <span v-if="(index != 0)" :style="{
-                                                    color: ((subindex == 6) || (DaysOfMonth[subindex][(index - 1)] && HolidayInMonth.includes(DaysOfMonth[subindex][(index - 1)]))) ? 'red' : foreground
-                                                }">
-                                                    <button class="w-full cursor-pointer" @click="() => {
-                                                        CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][(index - 1)]);
-                                                    }">
-                                                        {{
-                                                            DaysOfMonth[subindex][(index - 1)] }}
-                                                    </button>
-                                                </span>
-                                            </span>
-                                        </span>
-                                        <span
-                                            v-else-if="(ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) - DaysOfMonth[subindex].length == 0)">
-                                            <span v-if="OrganizeList.length > 0">
-                                                <span
-                                                    v-if="OrganizeList[(ArrayTools.getParentofNthChild(OrganizeList, subindex)[0] + 1)] != undefined && OrganizeList[(ArrayTools.getParentofNthChild(OrganizeList, subindex)[0] + 1)][0] < OrganizeList[(ArrayTools.getParentofNthChild(OrganizeList, subindex)[0])][0]">
-                                                    <span v-if="subindex < StartDayOfWeek">
-                                                        <span v-if="index == 0" :style="{
-                                                            color: ((subindex == 6) || (DaysOfMonth[subindex][DaysOfMonth[subindex].length - 1] && HolidayInMonth.includes(DaysOfMonth[subindex][DaysOfMonth[subindex].length - 1]))) ? 'red' : foreground
+                                            <span
+                                                v-else-if="(ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) - DaysOfMonth[subindex].length == 1)">
+                                                <span v-if="subindex > StartDayOfWeek">
+                                                    <span
+                                                        v-if="(index != (ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) - 1))"
+                                                        :style="{
+                                                            color: ((subindex == 6) || (DaysOfMonth[subindex][index] && HolidayInMonth.includes(DaysOfMonth[subindex][index]))) ? 'red' : foreground
                                                         }">
-                                                            <button class="w-full cursor-pointer" @click="() => {
-                                                                CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][DaysOfMonth[subindex].length - 1]);
+                                                        <button class="w-full cursor-pointer" @click="() => {
+                                                            CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index]);
+                                                            ShowCalender = false;
+                                                        }">
+                                                            {{
+                                                                DaysOfMonth[subindex][index] }}
+                                                        </button>
+                                                    </span>
+                                                </span>
+                                                <span v-else>
+                                                    <span v-if="(index != 0)" :style="{
+                                                        color: ((subindex == 6) || (DaysOfMonth[subindex][(index - 1)] && HolidayInMonth.includes(DaysOfMonth[subindex][(index - 1)]))) ? 'red' : foreground
+                                                    }">
+                                                        <button class="w-full cursor-pointer" @click="() => {
+                                                            CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][(index - 1)]);
+                                                            ShowCalender = false;
+                                                        }">
+                                                            {{
+                                                                DaysOfMonth[subindex][(index - 1)] }}
+                                                        </button>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                            <span
+                                                v-else-if="(ArrayTools.getMaximumInnerArrayLength(DaysOfMonth) - DaysOfMonth[subindex].length == 0)">
+                                                <span v-if="OrganizeList.length > 0">
+                                                    <span
+                                                        v-if="OrganizeList[(ArrayTools.getParentofNthChild(OrganizeList, subindex)[0] + 1)] != undefined && OrganizeList[(ArrayTools.getParentofNthChild(OrganizeList, subindex)[0] + 1)][0] < OrganizeList[(ArrayTools.getParentofNthChild(OrganizeList, subindex)[0])][0]">
+                                                        <span v-if="subindex < StartDayOfWeek">
+                                                            <span v-if="index == 0" :style="{
+                                                                color: ((subindex == 6) || (DaysOfMonth[subindex][DaysOfMonth[subindex].length - 1] && HolidayInMonth.includes(DaysOfMonth[subindex][DaysOfMonth[subindex].length - 1]))) ? 'red' : foreground
                                                             }">
-                                                                {{
-                                                                    DaysOfMonth[subindex][DaysOfMonth[subindex].length - 1]
-                                                                }}
-                                                            </button>
+                                                                <button class="w-full cursor-pointer" @click="() => {
+                                                                    CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][DaysOfMonth[subindex].length - 1]);
+                                                                    ShowCalender = false;
+                                                                }">
+                                                                    {{
+                                                                        DaysOfMonth[subindex][DaysOfMonth[subindex].length -
+                                                                        1]
+                                                                    }}
+                                                                </button>
+                                                            </span>
+                                                            <span v-else :style="{
+                                                                color: ((subindex == 6) || (DaysOfMonth[subindex][index - 1] && HolidayInMonth.includes(DaysOfMonth[subindex][index - 1]))) ? 'red' : foreground
+                                                            }">
+                                                                <button class="w-full cursor-pointer" @click="() => {
+                                                                    CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index - 1]);
+                                                                    ShowCalender = false;
+                                                                }">
+                                                                    {{
+                                                                        DaysOfMonth[subindex][index - 1]
+                                                                    }}
+                                                                </button>
+                                                            </span>
                                                         </span>
                                                         <span v-else :style="{
-                                                            color: ((subindex == 6) || (DaysOfMonth[subindex][index - 1] && HolidayInMonth.includes(DaysOfMonth[subindex][index - 1]))) ? 'red' : foreground
+                                                            color: ((subindex == 6) || (DaysOfMonth[subindex][index] && HolidayInMonth.includes(DaysOfMonth[subindex][index]))) ? 'red' : foreground
                                                         }">
                                                             <button class="w-full cursor-pointer" @click="() => {
-                                                                CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index - 1]);
+                                                                CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index]);
+                                                                ShowCalender = false;
                                                             }">
-                                                                {{
-                                                                    DaysOfMonth[subindex][index - 1]
-                                                                }}
+                                                                {{ DaysOfMonth[subindex][index] }}
                                                             </button>
                                                         </span>
                                                     </span>
@@ -351,69 +382,63 @@ onMounted(async () => {
                                                     }">
                                                         <button class="w-full cursor-pointer" @click="() => {
                                                             CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index]);
+                                                            ShowCalender = false;
                                                         }">
                                                             {{ DaysOfMonth[subindex][index] }}
                                                         </button>
                                                     </span>
                                                 </span>
-                                                <span v-else :style="{
-                                                    color: ((subindex == 6) || (DaysOfMonth[subindex][index] && HolidayInMonth.includes(DaysOfMonth[subindex][index]))) ? 'red' : foreground
-                                                }">
-                                                    <button class="w-full cursor-pointer" @click="() => {
-                                                        CurrentDate = new CalendarDate(CurrentDate.year, CurrentDate.month, DaysOfMonth[subindex][index]);
-                                                    }">
-                                                        {{ DaysOfMonth[subindex][index] }}
-                                                    </button>
-                                                </span>
                                             </span>
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </Transition>
-                    <Transition :duration="200" name="fade">
-                        <div class="font-(family-name:--primary-font) w-full h-[calc(100%-20px)] bg-transparent absolute top-[10px] left-0 flex flex-row justify-center items-center"
-                            v-show="ShowPopup">
-                            <div class="flex flex-row gap-x-[20px] justify-center items-center shadow-md px-[15px] py-[10px] rounded-[6px] shadow-(color:--shadow-color)"
-                                :style="{
-                                    background: background,
-                                    color: foreground,
-                                }">
-                                <select ref="YearSelector" @change="(ev) => YearSelectorChange(ev)"
-                                    className="px-[15px] text-[20px] font-bold hover:bg-(--datepicker-background-hover) transition-colors duration-150 ease-linear rounded-[6px] text-center cursor-pointer">
-                                    <option v-if="mode == DatePickerMode.ONLYPAST"
-                                        v-for="item in [...Array(yearRange).keys()].map(n => n + TodaysDate.year - yearRange + 1)"
-                                        :selected="item == CurrentDate.year" :value="item">{{ item }}</option>
-                                    <option v-else-if="mode == DatePickerMode.ONLYFUTURE"
-                                        v-for="item in [...Array(yearRange).keys()].map(n => n + TodaysDate.year + yearRange + 1)"
-                                        :selected="item == CurrentDate.year" :value="item">{{ item }}</option>
-                                    <option v-else-if="mode == DatePickerMode.PASTANDFUTURE"
-                                        v-for="item in [...Array(yearRange * 2).keys()].map(n => n + TodaysDate.year - yearRange + 1)"
-                                        :selected="item == CurrentDate.year" :value="item">{{ item }}</option>
-                                </select>
-                                <select v-if="YearSelector != null" @change="(ev) => MonthSelectorChange(ev)"
-                                    className="px-[15px] text-[20px] font-bold hover:bg-(--datepicker-background-hover) transition-colors duration-150 ease-linear rounded-[6px] text-center cursor-pointer">
-                                    <option v-if="mode == DatePickerMode.PASTANDFUTURE"
-                                        v-for="item in [...Array(12).keys()]" :selected="item == CurrentDate.month"
-                                        :value="item + 1">{{ Months[item] }}</option>
-                                    <template v-else-if="mode == DatePickerMode.ONLYPAST"
-                                        v-for="item in [...Array(12).keys()]">
-                                        <option :selected="item == CurrentDate.month" :value="item + 1">{{ Months[item]
-                                        }}
-                                        </option>
-                                    </template>
-                                    <template v-else-if="mode == DatePickerMode.ONLYFUTURE"
-                                        v-for="item in [...Array(12).keys()]">
-                                        <option :selected="item == CurrentDate.month" :value="item + 1">{{ Months[item]
-                                        }}
-                                        </option>
-                                    </template>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </Transition>
+                        <Transition :duration="200" name="fade">
+                            <div class="font-(family-name:--primary-font) w-full h-[calc(100%-20px)] bg-transparent absolute top-[10px] left-0 flex flex-row justify-center items-center"
+                                v-show="ShowPopup">
+                                <div class="flex flex-row gap-x-[20px] justify-center items-center shadow-md px-[15px] py-[10px] rounded-[6px] shadow-(color:--shadow-color)"
+                                    :style="{
+                                        background: background,
+                                        color: foreground,
+                                    }">
+                                    <select ref="YearSelector" @change="(ev) => YearSelectorChange(ev)"
+                                        className="px-[15px] text-[20px] font-bold hover:bg-(--datepicker-background-hover) transition-colors duration-150 ease-linear rounded-[6px] text-center cursor-pointer">
+                                        <option v-if="mode == DatePickerMode.ONLYPAST"
+                                            v-for="item in [...Array(yearRange).keys()].map(n => n + TodaysDate.year - yearRange + 1)"
+                                            :selected="item == CurrentDate.year" :value="item">{{ item }}</option>
+                                        <option v-else-if="mode == DatePickerMode.ONLYFUTURE"
+                                            v-for="item in [...Array(yearRange).keys()].map(n => n + TodaysDate.year + yearRange + 1)"
+                                            :selected="item == CurrentDate.year" :value="item">{{ item }}</option>
+                                        <option v-else-if="mode == DatePickerMode.PASTANDFUTURE"
+                                            v-for="item in [...Array(yearRange * 2).keys()].map(n => n + TodaysDate.year - yearRange + 1)"
+                                            :selected="item == CurrentDate.year" :value="item">{{ item }}</option>
+                                    </select>
+                                    <select v-if="YearSelector != null" @change="(ev) => MonthSelectorChange(ev)"
+                                        className="px-[15px] text-[20px] font-bold hover:bg-(--datepicker-background-hover) transition-colors duration-150 ease-linear rounded-[6px] text-center cursor-pointer">
+                                        <option v-if="mode == DatePickerMode.PASTANDFUTURE"
+                                            v-for="item in [...Array(12).keys()]" :selected="item == CurrentDate.month"
+                                            :value="item + 1">{{ Months[item] }}</option>
+                                        <template v-else-if="mode == DatePickerMode.ONLYPAST"
+                                            v-for="item in [...Array(12).keys()]">
+                                            <option :selected="item == CurrentDate.month" :value="item + 1">{{
+                                                Months[item]
+                                                }}
+                                            </option>
+                                        </template>
+                                        <template v-else-if="mode == DatePickerMode.ONLYFUTURE"
+                                            v-for="item in [...Array(12).keys()]">
+                                            <option :selected="item == CurrentDate.month" :value="item + 1">{{
+                                                Months[item]
+                                                }}
+                                            </option>
+                                        </template>
 
-                                </select>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                    </Transition>
+                        </Transition>
+                    </div>
                 </div>
             </div>
         </Transition>
