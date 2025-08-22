@@ -11,6 +11,10 @@ As you can see from the name of repository, This repository represents a date pi
 #### [jalali-moment](https://github.com/fingerpich/jalali-moment)
 #### [API](https://pnldev.com/api/calender) ~> برای بدست آوردن تعطیلات رسمی
 
+# Requirements - پیشنیاز ها
+```
+npm i @internationalized/date axios jalali-moment
+```
 # Run - اجرا
 ```
 npm run dev
